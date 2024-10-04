@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Pediment</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Fuente Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Encabezado -->
+    <header>
+        <img src="https://via.placeholder.com/150x50.png?text=GONTOR" alt="Logo GONTOR">
+        <span class="logo-text">QUICK PEDIMENT</span>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <div class="container">
+        <h1>Subir Factura PDF</h1>
+        <form>
+            <button type="button" onclick="document.getElementById('pdfInput').click();">Seleccionar Factura</button>
+            <input type="file" id="pdfInput" accept=".pdf" style="display: none;">
+            <button type="button" onclick="handleFileSelect()">Subir Factura</button>
+        </form>
+
+        <h2>Datos extraídos de la factura:</h2>
+        <div>
+            <label>Factura: </label> <input type="text" id="factura" readonly><br>
+            <label>Pedimento: </label> <input type="text" id="pedimento" readonly><br>
+            <label>Fecha: </label> <input type="text" id="fecha" readonly><br>
+            <label>Remesa: </label> <input type="text" id="remesa" readonly><br>
+            <label>COVE: </label> <input type="text" id="cove" readonly><br>
+            <label>Incoterm: </label> <input type="text" id="incoterm" readonly><br>
+            <label>Peso Total: </label> <input type="text" id="peso" readonly><br>
+            <label>Peso Bruto: </label> <input type="text" id="pesoBruto" readonly><br>
+        </div>
+
+        <!-- Campos manuales para ser llenados -->
+        <h2>Datos adicionales (Manual)</h2>
+        <div>
+            <label>Planta: </label> <input type="text" id="planta"><br>
+            <label>Proveedor: </label> <input type="text" id="proveedor"><br>
+            <label>Tipo de Operación: </label>
+            <select id="operacion">
+                <option value="importacion">Importación</option>
+                <option value="exportacion">Exportación</option>
+            </select><br>
+            <label>Transportista: </label> <input type="text" id="transportista"><br>
+            <label>Tráfico Master: </label> <input type="text" id="traficoMaster"><br>
+
+            <!-- Botones para llenar y limpiar campos -->
+            <div class="form-buttons">
+                <button type="button" onclick="llenarCampos()">Llenar Campos</button>
+                <button type="button" onclick="limpiarCampos()">Limpiar</button>
+            </div><br>
+
+            <label>Patente: </label> <input type="text" id="patente"><br>
+            <label>Número de Pedimento: </label> <input type="text" id="numeroPedimento"><br>
+            <label>Clave de Pedimento: </label> <input type="text" id="clavePedimento"><br>
+            <label>Aduana Despacho: </label> <input type="text" id="aduanaDespacho"><br>
+            <label>Aduana Salida: </label> <input type="text" id="aduanaSalida"><br>
+            <label>Cliente: </label> <input type="text" id="cliente"><br>
+            <label>Dirección: </label> <input type="text" id="direccion"><br>
+            <label>Pedimento: </label> <input type="text" id="manualPedimento"><br>
+            <label>Remesa: </label> <input type="text" id="manualRemesa"><br>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer>
+        <span>GONTOR | Quick Pediment</span>
+    </footer>
+
+    <script>
+        // Función para llenar campos automáticamente (ejemplo)
+        function llenarCampos() {
+            document.getElementById('planta').value = "Planta Ejemplo";
+            document.getElementById('proveedor').value = "Proveedor Ejemplo";
+            document.getElementById('operacion').value = "importacion";
+            document.getElementById('transportista').value = "Transportista Ejemplo";
+            document.getElementById('traficoMaster').value = "TM12345";
+            document.getElementById('patente').value = "123456";
+            document.getElementById('numeroPedimento').value = "789012";
+            document.getElementById('clavePedimento').value = "A1B2C3";
+            document.getElementById('aduanaDespacho').value = "Aduana Ejemplo";
+            document.getElementById('aduanaSalida').value = "Aduana Ejemplo";
+            document.getElementById('cliente').value = "Cliente Ejemplo";
+            document.getElementById('direccion').value = "Calle Ejemplo 123";
+            document.getElementById('manualPedimento').value = "PED12345";
+            document.getElementById('manualRemesa').value = "REM12345";
+        }
+
+        // Función para limpiar campos manuales
+        function limpiarCampos() {
+            document.getElementById('planta').value = "";
+            document.getElementById('proveedor').value = "";
+            document.getElementById('operacion').value = "";
+            document.getElementById('transportista').value = "";
+            document.getElementById('traficoMaster').value = "";
+            document.getElementById('patente').value = "";
+            document.getElementById('numeroPedimento').value = "";
+            document.getElementById('clavePedimento').value = "";
+            document.getElementById('aduanaDespacho').value = "";
+            document.getElementById('aduanaSalida').value = "";
+            document.getElementById('cliente').value = "";
+            document.getElementById('direccion').value = "";
+            document.getElementById('manualPedimento').value = "";
+            document.getElementById('manualRemesa').value = "";
+        }
+
+        // Función para manejar la selección del archivo
+        async function handleFileSelect() {
+            const file = document.getElementById('pdfInput').files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('pdfInput', file);
+
+            const response = await fetch('/extraer-parametros', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                const datos = await response.json();
+                console.log('Datos extraídos:', datos);
+
+                // Mostrar los datos extraídos en los campos correspondientes
+                document.getElementById('factura').value = datos.Factura || 'N/A';
+                document.getElementById('pedimento').value = datos.Pedimento || 'N/A';
+                document.getElementById('fecha').value = datos.Fecha || 'N/A';
+                document.getElementById('remesa').value = datos.Remesa || 'N/A';
+                document.getElementById('cove').value = datos.COVE || 'N/A';
+                document.getElementById('incoterm').value = datos.Incoterm || 'N/A';
+                document.getElementById('peso').value = datos.Peso || 'N/A';
+                document.getElementById('pesoBruto').value = datos.PesoBruto || 'N/A';
+            } else {
+                console.error('Error al procesar el archivo');
+            }
+        }
+    </script>
+</body>
+</html>
